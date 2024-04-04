@@ -69,18 +69,18 @@ app.get("/tasks/:id", (req, res) => {
     else{
         res.status(400).send('Error: task not found.');
     }
-})
+});
 
 app.post("/tasks", (req, res) => {
     const { taskDescription, dueDate, completed } = req.body;
 
     //handle invalid request body(s)
     let msg = "";
-    if(!taskDescription)    msg += "Task description missing. ";
-    if(!dueDate)    msg += "Due date missing. ";
-    if(typeof(completed) !== 'boolean') msg += "Completed body missing or invalid. ";
+    if(!taskDescription)    msg += 'Task description missing. ';
+    if(!dueDate)    msg += 'Due date missing. ';
+    if(typeof(completed) !== 'boolean') msg += 'Completed body missing or invalid. ';
     if(msg !== ""){
-        return res.status(400).send(msg);
+        return res.status(400).send('Error: ' + msg);
     }
 
     let newTask = {
@@ -94,12 +94,34 @@ app.post("/tasks", (req, res) => {
     tasks.push(newTask);
 
     res.status(201).send(newTask);
-})
+});
+
+app.put("/tasks/:id", (req, res) => {
+    const task = tasks.find((item) => item.id === req.params.id);
+    if(!task){
+        return res.status(400).send('Error: task not found. No changes were made.');
+    }
+
+    const { id, taskDescription, createdDate, dueDate, completed } = req.body;
+    let msg = "";
+    if(!taskDescription)    msg += 'Task description missing. ';
+    if(!dueDate)    msg += 'Due date missing. ';
+    if(typeof(completed) !== 'boolean') msg += 'Completed body missing or invalid. ';
+    if(msg !== ''){
+        return res.status(400).send('Error: ' + msg);
+    }
+
+    task.taskDescription = taskDescription;
+    task.dueDate = dueDate;
+    task.completed = completed;
+
+    res.status(200).send(task);
+});
 
 const generateGUID = () => {
     let guid = guidv4Module.createGuidv4();
     return guid;
-}
+};
 
 app.listen(3000, () => {
     console.log(`listening on port 3000`);
