@@ -118,6 +118,17 @@ app.put("/tasks/:id", (req, res) => {
     res.status(200).send(task);
 });
 
+app.delete("/tasks/:id", (req, res) => {
+    const taskIdx = tasks.findIndex((item) => item.id === req.params.id);
+    if(taskIdx === -1){
+        return res.status(400).send('Error: task not found.');
+    }
+
+    tasks.splice(taskIdx, 1);
+
+    res.status(200).send();
+})
+
 const generateGUID = () => {
     let guid = guidv4Module.createGuidv4();
     return guid;
