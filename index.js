@@ -1,7 +1,9 @@
+const guidv4Module = require('./gen_guid');
+
 const express = require('express');
-const http = require('http');
 
 const app = express();
+app.use(express.json());
 
 const firstTaskDate = new Date(2023, 5, 16);
 const firstTaskDueDate = new Date(2024, 7, 29);
@@ -27,9 +29,8 @@ let tasks = [
 ]
 
 app.get("/tasks", (req, res) => {
-    // res.send("hello world");
     if(req.query.completed !== 'true' && req.query.completed !== 'false'){
-        res.status(400).send('Error: invalid value for "completed" parameter.');
+        return res.status(400).send('Error: invalid value for "completed" parameter.');
     }
 
     let completed = (req.query.completed === 'true');
@@ -69,6 +70,36 @@ app.get("/tasks/:id", (req, res) => {
         res.status(400).send('Error: task not found.');
     }
 })
+
+app.post("/tasks", (req, res) => {
+    const { taskDescription, dueDate, completed } = req.body;
+
+    //handle invalid request body(s)
+    let msg = "";
+    if(!taskDescription)    msg += "Task description missing. ";
+    if(!dueDate)    msg += "Due date missing. ";
+    if(typeof(completed) !== 'boolean') msg += "Completed body missing or invalid. ";
+    if(msg !== ""){
+        return res.status(400).send(msg);
+    }
+
+    let newTask = {
+        id: generateGUID(),
+        taskDescription: taskDescription,
+        createdDate: new Date(),
+        dueDate: dueDate,
+        completed: completed,
+    }
+
+    tasks.push(newTask);
+
+    res.status(201).send(newTask);
+})
+
+const generateGUID = () => {
+    let guid = guidv4Module.createGuidv4();
+    return guid;
+}
 
 app.listen(3000, () => {
     console.log(`listening on port 3000`);
