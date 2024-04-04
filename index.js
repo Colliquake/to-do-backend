@@ -1,5 +1,8 @@
+const guidv4Module = require('./gen_guid');
+
 const express = require('express');
 const http = require('http');
+const { isGeneratorObject } = require('util/types');
 
 const app = express();
 
@@ -27,7 +30,6 @@ let tasks = [
 ]
 
 app.get("/tasks", (req, res) => {
-    // res.send("hello world");
     if(req.query.completed !== 'true' && req.query.completed !== 'false'){
         res.status(400).send('Error: invalid value for "completed" parameter.');
     }
@@ -69,6 +71,15 @@ app.get("/tasks/:id", (req, res) => {
         res.status(400).send('Error: task not found.');
     }
 })
+
+app.post("/tasks", (req, res) => {
+    
+})
+
+const generateGUID = () => {
+    let guid = guidv4Module.create_guidv4();
+    return guid;
+}
 
 app.listen(3000, () => {
     console.log(`listening on port 3000`);
