@@ -1,15 +1,18 @@
-const Model = require('../model/model');
 const express = require('express');
 const guidv4Module = require('../gen_guid');
-
 const router = express.Router();
 
 module.exports = router;
+
+const getModel = require('../model/model');
 
 router.get("/tasks", async (req, res) => {
     if (req.query.completed !== 'true' && req.query.completed !== 'false') {
         return res.status(400).send({message: 'Error: invalid value for completed parameter.'});
     }
+
+    const collectionName = req.query.collectionName;
+    const Model = getModel(collectionName);
 
     let completed = (req.query.completed === 'true');
     let sortBy = req.query.sort_by;
@@ -43,6 +46,9 @@ router.get("/tasks", async (req, res) => {
 });
 
 router.get("/tasks/:id", async (req, res) => {
+    const collectionName = req.query.collectionName;
+    const Model = getModel(collectionName);
+
     try {
         const task = await Model.find({ id: req.params.id });
         if (task.length === 0) {
@@ -56,6 +62,9 @@ router.get("/tasks/:id", async (req, res) => {
 });
 
 router.post("/tasks", async (req, res) => {
+    const collectionName = req.query.collectionName;
+    const Model = getModel(collectionName);
+
     const { taskDescription, dueDate, completed } = req.body;
 
     let msg = "";
@@ -84,6 +93,9 @@ router.post("/tasks", async (req, res) => {
 });
 
 router.put("/tasks/:id", async (req, res) => {
+    const collectionName = req.query.collectionName;
+    const Model = getModel(collectionName);
+
     try {
         const { id, taskDescription, createdDate, dueDate, completed } = req.body;
         let msg = "";
@@ -106,6 +118,9 @@ router.put("/tasks/:id", async (req, res) => {
 });
 
 router.delete("/tasks/:id", async(req, res) => {
+    const collectionName = req.query.collectionName;
+    const Model = getModel(collectionName);
+    
     try {
         const filter = {id: req.params.id};
         const data = await Model.findOneAndDelete(filter);
