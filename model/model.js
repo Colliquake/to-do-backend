@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+mongoose.pluralize(null);
 
 function getModel(collectionName) {
     const taskSchema = new mongoose.Schema({
