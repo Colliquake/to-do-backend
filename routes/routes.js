@@ -7,18 +7,27 @@ module.exports = router;
 const getModel = require('../model/model');
 
 router.get("/tasks", async (req, res) => {
-    if (req.query.completed !== 'true' && req.query.completed !== 'false') {
+    if (req.query.completed !== 'true' && req.query.completed !== 'false' && req.query.completed !== 'all') {
         return res.status(400).send({message: 'Error: invalid value for completed parameter.'});
     }
 
     const collectionName = req.query.collectionName;
     const Model = getModel(collectionName);
 
-    let completed = (req.query.completed === 'true');
+    let completed = req.query.completed;
     let sortBy = req.query.sort_by;
 
     try {
-        let filteredTasks = (await Model.find()).filter((task) => task.completed === completed);
+        let filteredTasks;
+        if(completed === 'true'){
+            filteredTasks = (await Model.find()).filter((task) => task.completed === true);
+        }
+        else if(completed === 'false'){
+            filteredTasks = (await Model.find()).filter((task) => task.completed === false);
+        }
+        else{
+            filteredTasks = await Model.find();
+        }
 
         if (sortBy) {
             switch (sortBy) {
